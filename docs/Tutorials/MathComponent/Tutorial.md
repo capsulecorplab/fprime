@@ -535,7 +535,7 @@ There are two event reports, one for receiving a command
 and one for receiving a result.
 
 1. **Telemetry:** These are **channels** that define telemetry
-points that the this component can emit.
+points that this component can emit.
 There are four telemetry channels: three for the arguments
 to the last command received and one for the last
 result received.
