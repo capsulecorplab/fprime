@@ -609,7 +609,7 @@ of cores available on your system.
 
 **Inspect the generated code:**
 The generated code resides in the directory
-`Ref/fprime-build-automatic-native-ut/Ref/MathSender`.
+`Ref/build-fprime-automatic-native-ut/Ref/MathSender`.
 You may wish to look over the file `MathSenderComponentAc.hpp`
 to get an idea of the interface to the auto-generated
 base class `MathSenderComponentBase`.
