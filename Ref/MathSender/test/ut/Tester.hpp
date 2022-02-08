@@ -14,7 +14,7 @@
 #define TESTER_HPP
 
 #include "GTestBase.hpp"
-#include "Ref/MathSender/MathSenderComponentImpl.hpp"
+#include "Ref/MathSender/MathSender.hpp"
 
 namespace Ref {
 
@@ -89,7 +89,7 @@ namespace Ref {
 
       //! The component under test
       //!
-      MathSenderComponentImpl component;
+      MathSender component;
 
   };
 
