@@ -73,6 +73,10 @@ namespace Ref {
       // Helper methods
       // ----------------------------------------------------------------------
 
+      //! Test a DO_MATH command
+      //!
+      void testDoMath(MathOp op);
+
       //! Connect ports
       //!
       void connectPorts();
