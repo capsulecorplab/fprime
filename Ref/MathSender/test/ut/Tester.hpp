@@ -42,9 +42,9 @@ namespace Ref {
       // Tests
       // ----------------------------------------------------------------------
 
-      //! To do
+      //! Test an ADD command
       //!
-      void toDo();
+      void testAddCommand();
 
     private:
 
