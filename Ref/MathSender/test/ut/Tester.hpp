@@ -46,6 +46,9 @@ namespace Ref {
       //!
       void testAddCommand();
 
+      //! Test receipt of a result
+      void testResult();
+
     private:
 
       // ----------------------------------------------------------------------

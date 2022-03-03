@@ -109,6 +109,31 @@ namespace Ref {
     this->testDoMath(MathOp::ADD);
   }
 
+  void Tester ::
+    testResult()
+  {
+    // Generate an expected result
+    const F32 result = 10.0;
+    // reset all telemetry and port history
+    this->clearHistory();
+    // call result port with result
+    this->invoke_to_mathResultIn(0, result);
+    // retrieve the message from the message queue and dispatch the command to the handler
+    this->component.doDispatch();
+    // verify one telemetry value was written
+    ASSERT_TLM_SIZE(1);
+    // verify the desired telemetry channel was sent once
+    ASSERT_TLM_RESULT_SIZE(1);
+    // verify the values of the telemetry channel
+    ASSERT_TLM_RESULT(0, result);
+    // verify one event was sent
+    ASSERT_EVENTS_SIZE(1);
+    // verify the expected event was sent once
+    ASSERT_EVENTS_RESULT_SIZE(1);
+    // verify the expect value of the event
+    ASSERT_EVENTS_RESULT(0, result);
+  }
+
   // ----------------------------------------------------------------------
   // Handlers for typed from ports
   // ----------------------------------------------------------------------
