@@ -11,6 +11,7 @@
 // ======================================================================
 
 #include "Tester.hpp"
+#include "STest/Pick/Pick.hpp"
 
 #define INSTANCE 0
 #define MAX_HISTORY_SIZE 10
