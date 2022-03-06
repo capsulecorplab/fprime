@@ -11,7 +11,7 @@ not including _build. This is for historical reasons.
 Specifically does nothing.  The "all" target of a normal cmake build will cover this case.
 
 
-## setup_build_module:
+## build_setup_build_module:
 
 Helper function to setup the module. This was the historical core of the CMake system, now embedded as part of this
 build target. It adds a the target (library, executable), sets up compiler source files, flags generated sources,

@@ -61,11 +61,12 @@ set(SOURCE_FILES
 - **MOD_DEPS:** (optional) cmake list of extra link dependencies. This is optional, and only
   needed if non-standard link dependencies are used, or if a dependency cannot be inferred from the include graph of
   the autocoder inputs to the module. If not set or supplied, only fprime inferable dependencies will be available.
-  Link flags like "-lpthread" can be added here as well.
+  Link flags like "-lpthread" can be added here as well. Do NOT supply executable targets in MOD_DEPS. See:
+  `register_fprime_executable` for alternatives.
 
 **i.e.:**
 ```
-set(LINK_DEPS
+set(MOD_DEPS
     Os
     Module1
     Module2
@@ -135,9 +136,11 @@ Registers an executable using the fprime build system. This comes with dependenc
 fprime autocoding capabilities. This requires three variables to define the executable name,
 autocoding and source inputs, and (optionally) any non-standard link dependencies.
 
+Note: this is not intended for deployment executables (e.g. an fprime binary) but rather for utilities,
+helper executables and tools. To register a deployment binary see `register_fprime_deployment`.
+
 Executables will automatically install itself and its dependencies into the out-of-cache build
-artifacts directory, specified by the FPRIME_INSTALL_DEST variable, when built. To skip this
-installation step, set the SKIP_INSTALL variable before registering an executable.
+artifacts directory, specified by the FPRIME_INSTALL_DEST variable, when built.
 
 Required variables (defined in calling scope):
 
@@ -162,58 +165,33 @@ set(SOURCE_FILES
 
 **i.e.:**
 ```
-set(LINK_DEPS
+set(MOD_DEPS
     Module1
     Module2
     -lpthread)
 ```
 
 **Note:** this operates almost identically to `register_fprime_module` with respect to the variable definitions. The
-          difference is this call will yield an optionally named linked binary file.
+          difference is this call will yield an optionally named linked binary executable.
 
-### Standard fprime Deployment Example ###
+### Caveats ###
 
-To create a standard fprime deployment, an executable needs to be created. This executable
-uses the CMake PROJECT_NAME as the executable name. Thus, it can be created with the following
-source lists. In most fprime deployments, some modules must be specified as they don't tie
-directly to an Ai.xml.
+Executable targets should not be supplied as dependencies through MOD_DEPS  (e.g. to register_fprime_deployment).
+Doing so may cause problems with final linking of other executables due to multiple main function definitions. A
+better model would be to add a CMake only dependency without using MOD_DEPS.
 
+**Note:** these errors are definition order dependent and thus users should not supply executables through MOD_DEPS
+even if it seems to work correctly.
+
+ **i.e.:**
 ```
-set(SOURCE_FILES
-  "${CMAKE_CURRENT_LIST_DIR}/RefTopologyAppAi.xml"
-  "${CMAKE_CURRENT_LIST_DIR}/Topology.cpp"
-  "${CMAKE_CURRENT_LIST_DIR}/Main.cpp"
-)
-# Note: supply non-explicit dependencies here. These are implementations to an XML that is
-# defined in a different module.
-set(MOD_DEPS
-  Svc/PassiveConsoleTextLogger
-  Svc/SocketGndIf
-  Svc/LinuxTime
-)
-register_fprime_executable()
+set(SOURCE_FILES "tool.c")
+register_fprime_executable(TOOL)
+...
+...
+register_fprime_deployment(MY_DEPLOYMENT)
+add_dependencies(MY_DEPLOYMENT TOOL) # CMake only dependency
 ```
-### fprime Executable With Autocoding/Dependencies ###
-
-Developers can make executables or other utilities that take advantage of fprime autocoding
-and fprime dependencies. These can be registered using the same executable registrar function
-but should specify a specific executable name.
-
-```
-set(EXECUTABLE_NAME "MyUtility")
-
-set(SOURCE_FILES
-  "${CMAKE_CURRENT_LIST_DIR)/ModuleAi.xml"
-  "${CMAKE_CURRENT_LIST_DIR}/Main.cpp"
-)
-set(MOD_DEPS
-  Svc/LinuxTime
-  -lm
-  -lpthread
-)
-register_fprime_executable()
-```
-
 
 
 ## Function `register_fprime_deployment`:
@@ -223,14 +201,15 @@ fprime autocoding capabilities. This requires two variables to define autocoding
 (optionally) any non-standard link dependencies.
 
 An executable will be created and automatically install itself and its dependencies into the out-of-cache build
-artifacts directory, specified by the FPRIME_INSTALL_DEST variable, when built. To skip this
-installation step, set the SKIP_INSTALL variable before registering an executable. Dictionary generation will also be
-done as part of this step.
+artifacts directory, specified by the FPRIME_INSTALL_DEST variable, when built. This will automatically run all
+deployment targets such that the standard deployment will be built (e.g. the dictionary will be built).
+
+This is typically called from within the top-level CMakeLists.txt file that defines a deployment.
 
 Required variables (defined in calling scope):
 
 - **SOURCE_FILES:** cmake list of input source files. Place any "*Ai.xml", "*.c", "*.cpp"
-                 etc. files here. This list will be split into autocoder inputs and sources.
+                    etc. files here. This list will be split into autocoder inputs and sources.
 **i.e.:**
 ```
 set(SOURCE_FILES
@@ -239,23 +218,22 @@ set(SOURCE_FILES
     MyComponentImpl.cpp)
 ```
 
-- **MOD_DEPS:** (optional) cmake list of extra link dependencies. This is optional, and only
-  needed if non-standard link dependencies are used, or if a dependency cannot be inferred from the include graph of
-  the autocoder inputs to the module. If not set or supplied, only fprime
-  inferable dependencies will be available. Link flags like "-lpthread" can be here.
+- **MOD_DEPS:** cmake list of extra link dependencies. This is almost always required to supply the topology module.
+                Other entries are only needed when they cannot be inferred from the model (e.g. linker flags). Do NOT
+                supply executable targets in MOD_DEPS. See: `register_fprime_executable` for alternatives.
 
 **i.e.:**
 ```
-set(LINK_DEPS
+set(MOD_DEPS
+    ${PROJECT_NAME}/Top
     Module1
     Module2
     -lpthread)
 ```
 
 **Note:** this operates almost identically to `register_fprime_executable` and `register_fprime_module` with respect
-to the variable definitions. The difference is this call will yield an optionally named linked binary file,
-dictionary generation is done, the executable binary will be named for ${PROJECT_NAME}, and deployment helper targets
-are created.
+to the variable definitions. The difference is deployment targets will be run (e.g. dictionary generation), and the
+executable binary will be named for ${PROJECT_NAME}.
 
 ### Standard fprime Deployment Example ###
 
@@ -271,9 +249,7 @@ set(SOURCE_FILES
 # Note: supply non-explicit dependencies here. These are implementations to an XML that is
 # defined in a different module.
 set(MOD_DEPS
-  Svc/PassiveConsoleTextLogger
-  Svc/SocketGndIf
-  Svc/LinuxTime
+  ${PROJECT_NAME}/Top
 )
 register_fprime_deployment()
 ```
@@ -337,44 +313,38 @@ register_fprime_ut()
 ```
 
 
-## Function `register_fprime_target`:
+## Macro `register_fprime_target`:
 
-Some custom targets require a multi-phase build process that is run for each module, and for the
-deployment/executable that is being built. These must therefore register module-specific and
-deployment specific instructions.
+This function allows users to register custom build targets into the build system.  These targets are defined in a
+CMake file and consist of three functions that operate on different parts of the build: global, per-module, and
+per-deployment. See: [Targets](targets.md).
 
-**Examples:**
-- dict: build sub dictionaries for each module, and roll-up into a global deployment dictionary
-- sloc: lines of code are counted per-module
-- docs: documentation is also per-module
+This function takes in either a file path to a CMake file defining targets, or an short include path that accomplishes
+the same thing. Note: make sure the directory is on the CMake include path to use the second form. The supplied file
+should define three functions: `add_global_target`, `add_module_target`, and `add_deployment_target`.
 
-This function allows the user to register a file containing two functions `add_module_target`
-and `add_global_target`. `add_global_target` adds a top-level target like `make dict` which will
-then depend on every one of the targets created in `add_module_target`.
+**TARGET_FILE_PATH:** include path or file path file defining above functions
 
-**TARGET_FILE_PATH:** path to file defining above functions
-
-function(register_fprime_target TARGET_FILE_PATH)
-    register_fprime_target_generic(FPRIME_TARGET_LIST ${TARGET_FILE_PATH})
-endfunction(register_fprime_target)
-
-function(register_fprime_ut_target TARGET_FILE_PATH)
-    # UT targets only allowed when testing
-    if (BUILD_TESTING)
-        register_fprime_target_generic(FPRIME_UT_TARGET_LIST ${TARGET_FILE_PATH})
+macro(register_fprime_target TARGET_FILE_PATH)
+    # Normal registered targets don't run in prescan
+    if (NOT DEFINED FPRIME_PRESCAN)
+        register_fprime_target_helper("${TARGET_FILE_PATH}" FPRIME_TARGET_LIST)
     endif()
-endfunction(register_fprime_ut_target)
-
-function(register_fprime_target_generic TARGET_LIST TARGET_FILE_PATH)
-    # Update the global list of target files
-    set(TMP "${${TARGET_LIST}}")
-    list(APPEND TMP "${TARGET_FILE_PATH}")
-    list(REMOVE_DUPLICATES TMP)
-    SET(${TARGET_LIST} "${TMP}" CACHE INTERNAL "${TARGET_LIST}: custom fprime targets" FORCE)
-    #Setup global target. Note: module targets found during module processing
-    setup_global_target("${TARGET_FILE_PATH}")
-endfunction(register_fprime_target_generic)
+endmacro(register_fprime_target)
 
 
 
-## 
+## Macro `register_fprime_target_helper`:
+
+Helper function to do the actual registration. Also used to side-load prescan to bypass the not-on-prescan check.
+
+
+## Next Topics:
+ - Setting Options: [Options](Options.md) are used to vary a CMake build.
+ - Adding Deployment: [Deployments](deployment.md) create fprime builds.
+ - Adding Module: [Modules](module.md) register fprime Ports, Components, etc.
+ - Creating Toolchains: [Toolchains](toolchain.md) setup standard CMake Cross-Compiling.
+ - Adding Platforms: [Platforms](platform.md) help fprime set Cross-Compiling specific items.
+ - Adding Targets: [Targets](targets.md) for help defining custom build targets
+
+
