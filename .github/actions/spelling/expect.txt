@@ -256,6 +256,8 @@ cplusplus
 CPOL
 cpos
 cpp
+cppreference
+cprogramming
 cpuset
 cpy
 CRCAMPCS
@@ -361,6 +363,7 @@ dlog
 dnp
 DNs
 doall
+docblocks
 docbook
 dockerfile
 docset
@@ -449,6 +452,7 @@ endianness
 endif
 endl
 endloc
+endmacro
 endswith
 enduml
 ENOENT
@@ -921,6 +925,7 @@ maxsize
 maxspew
 mccabe
 mcomment
+MCT
 mcternan
 mday
 mdbasiccomponents
@@ -1084,6 +1089,7 @@ opcodes
 opendir
 openjdk
 opengroup
+openmct
 openpyxl
 openssl
 oper
@@ -1145,6 +1151,7 @@ PINGSEND
 pinit
 pkill
 pkts
+placeholders
 plainnat
 plantuml
 plugin
@@ -1431,6 +1438,7 @@ splitext
 splitlines
 sprintf
 Sqlite
+SQL's
 sramanan
 srand
 srandom

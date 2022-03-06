@@ -17,6 +17,9 @@ jobs:
     steps:
     # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
     - uses: actions/checkout@v2
+      with:
+        fetch-depth: 0
+    - run: git fetch --tags
     - name: Install fprime tools
       run: pip3 install fprime-tools fprime-gds
     - name: F prime CI step
@@ -73,6 +76,9 @@ jobs:
     steps:
     # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
     - uses: actions/checkout@v2
+      with:
+        fetch-depth: 0
+    - run: git fetch --tags
     - name: Install fprime tools
       run: pip3 install fprime-tools fprime-gds
     - name: Setup Dependencies
@@ -93,17 +99,19 @@ jobs:
     steps:
     # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
     - uses: actions/checkout@v2
+      with:
+        fetch-depth: 0
+    - run: git fetch --tags
     - name: Install fprime tools
       run: pip3 install fprime-tools fprime-gds
     - name: Setup Dependencies
       run: |
         sudo apt-get update
         sudo apt-get install clang-tidy-12
-    # TODO: Switch to using fprime-util build --all --ut after next fprime-tools release
     - name: General Static Analysis
       run: |
         fprime-util generate --ut -DCMAKE_C_COMPILER=gcc-10 -DCMAKE_CXX_COMPILER=g++-10 -DCMAKE_CXX_CLANG_TIDY=clang-tidy-12
-        cd build-fprime-automatic-native-ut && make -j4
+        fprime-util build --all --ut
     - name: Flight Code Static Analysis
       run: |
         fprime-util generate -DCMAKE_C_COMPILER=gcc-10 -DCMAKE_CXX_COMPILER=g++-10 -DCMAKE_CXX_CLANG_TIDY="clang-tidy-12;--config-file=$PWD/release.clang-tidy"
@@ -115,6 +123,9 @@ jobs:
     steps:
     # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
     - uses: actions/checkout@v2
+      with:
+        fetch-depth: 0
+    - run: git fetch --tags
     - name: Install fprime tools
       run: pip3 install fprime-tools fprime-gds
     - name: CMake Tests
