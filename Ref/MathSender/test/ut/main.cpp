@@ -1,5 +1,5 @@
 #include "Tester.hpp"
-#include STest/Random/Random.hpp
+#include "STest/Random/Random.hpp"
 
 TEST(Nominal, AddCommand) {
     Ref::Tester tester;
