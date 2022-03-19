@@ -49,6 +49,7 @@ add_fprime_subdirectory("${CMAKE_CURRENT_LIST_DIR}/Top/")
 add_fprime_subdirectory("${CMAKE_CURRENT_LIST_DIR}/MathTypes/")
 add_fprime_subdirectory("${CMAKE_CURRENT_LIST_DIR}/MathPorts/")
 add_fprime_subdirectory("${CMAKE_CURRENT_LIST_DIR}/MathSender/")
+add_fprime_subdirectory("${CMAKE_CURRENT_LIST_DIR}/MathReceiver/")
 
 set(SOURCE_FILES "${CMAKE_CURRENT_LIST_DIR}/Top/Main.cpp")
 set(MOD_DEPS ${PROJECT_NAME}/Top)
