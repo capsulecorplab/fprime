@@ -118,7 +118,11 @@ namespace Ref {
         const U32 cmdSeq
     )
   {
-    // TODO
+    // clear throttle
+    this->log_ACTIVITY_HI_FACTOR_UPDATED_ThrottleClear();
+    // send event that throttle is cleared
+    this->log_ACTIVITY_HI_THROTTLE_CLEARED();
+    // reply with completion status
     this->cmdResponse_out(opCode,cmdSeq,Fw::CmdResponse::OK);
   }
 
