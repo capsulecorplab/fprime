@@ -102,7 +102,10 @@ namespace Ref {
         NATIVE_UINT_TYPE context
     )
   {
-    // TODO
+    U32 numMsgs = this->m_queue.getNumMsgs();
+    for (U32 i = 0; i < numMsgs; ++i) {
+        (void) this->doDispatch();
+    }
   }
 
   // ----------------------------------------------------------------------
