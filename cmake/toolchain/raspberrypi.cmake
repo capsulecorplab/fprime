@@ -15,8 +15,10 @@ set(CMAKE_SYSTEM_VERSION    1)
 
 # Set the GNU ARM toolchain
 set(CMAKE_AR            arm-linux-gnueabihf-ar)
-set(CMAKE_C_COMPILER    arm-linux-gnueabihf-gcc)
-set(CMAKE_CXX_COMPILER  arm-linux-gnueabihf-g++)
+find_program(CMAKE_C_COMPILER NAMES aarch64-linux-gnu-gcc aarch64-none-linux-gnu-gcc PATHS ENV AARCH_DIR PATH_SUFFIXES bin REQUIRED)
+find_program(CMAKE_CXX_COMPILER NAMES aarch64-linux-gnu-g++ aarch64-none-linux-gnu-g++ PATHS ENV AARCH_DIR PATH_SUFFIXES bin REQUIRED)
+message(STATUS "[aarch64-linux] C Compiler: ${CMAKE_C_COMPILER}")
+message(STATUS "[aarch64-linux] CXX Compiler: ${CMAKE_CXX_COMPILER}")
 set(CMAKE_ASM_COMPILER  arm-linux-gnueabihf-as)
 set(CMAKE_OBJCOPY       arm-linux-gnueabihf-objcopy)
 set(CMAKE_OBJDUMP       arm-linux-gnueabihf-objdump)
